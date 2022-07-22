@@ -17,12 +17,11 @@ let manager, image;
 which will allow changes*/
 let text ='A';
 let fontSize = 1200;
-let fontFamily = '-apple-system, BlinkMacSystemFont,Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell';
+let fontFamily = 'helvetica';
 
 const typeCanvas = document.createElement('canvas');
 const typeContext = typeCanvas.getContext('2d');
 
-//random color
    const randomColor = () => {
       let letters = '01ABCDEF';
       let color = '#';
@@ -38,7 +37,7 @@ const typeContext = typeCanvas.getContext('2d');
 //make context, width, height data available for grid properties of typeCanvas to read
 const sketch = ({context, width, height}) => {
 
-  const cell = 10;
+  const cell = 20;
 
   const cols = Math.floor (width / cell);
   const rows = Math.floor (height / cell);
@@ -52,11 +51,13 @@ const sketch = ({context, width, height}) => {
     typeContext.fillStyle = '#dac4c7';
     typeContext.fillRect(0, 0, cols, rows);
 
-    fontSize = cols *1.2;
+    fontSize = cols;
 
 
     //critical to display image on screen
     typeContext.drawImage(image, 0, 0, cols, rows);
+
+    typeContext.fillStyle = randomColor();
 
     //typeContext.font = fontSize + 'px' + fontFamily;
     typeContext.font = `$(fontSize)px $(fontFamily)`;
@@ -77,12 +78,7 @@ const sketch = ({context, width, height}) => {
 
     const typeData = typeContext.getImageData(0, 0, cols, rows).data;
 
-    
-		context.fillStyle = 'black'
-		context.fillRect(0, 0, width, height);
-
-		context.textBaseline = 'middle';
-		context.textAlign = 'center';
+    context.drawImage(typeCanvas, 0, 0);
 
     for (let i = 0; i < numCells; i++) {
       const col = i % cols;
@@ -97,36 +93,22 @@ const sketch = ({context, width, height}) => {
       const b = typeData[i * 4 + 2];
       const a = typeData[i * 4 + 3];
 
-      const glyph = getGlyph(r);
-
-			context.font = `${cell * 1}px ${fontFamily}`;
-			if (Math.random() < 0.1) context.font = `${cell * 1.3}px ${fontFamily}`;
-      //context.fillStyle='hsl(' + 360 * Math.random() + ', 50%, 70%)';
-      context.fillStyle = "white";
+      context.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
       context.save();
       context.translate(x, y);
       context.translate(cell * 0.5, cell * 0.5);
 
-      context.fillText(glyph, 0, 0);
+      //circle drawing
+      context.beginPath();
+      context.arc(0, 0, cell * 0.5, 0, Math.PI * 2);
+      context.fill();
 
 
       context.restore();
     }
   };
 
-};
-
-
-const getGlyph = (v) => {
-	if (v < 50) return '';
-	if (v < 100) return '.';
-	if (v < 150) return '-';
-	if (v < 200) return '+';
-
-	const glyphs = 'web3'.split('');
-
-	return random.pick(glyphs);
 };
 
 const loadMeSomeImage = (url) => {
